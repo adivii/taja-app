@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Taja</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_description_title">Apa Itu Taja?</string>
+    <string name="app_description_content">TAJA dirancang sebagai sebuah media informasi yang dapat digunakan oleh para petani di Kabupaten Tanggamus untuk mempelajari berbagai teknik pertanian guna meningkatkan hasil pertanian. Disini, kami memberikan wadah untuk pelatihan dan panduan tentang cara menanam yang memberikan hasil terbaik, penggunaan pupuk yang tepat guna memaksimalkan hasil, pemilihan bibit yang unggul, dan lain-lain.</string>
+    <string name="welcome_message">Welcome, Back!</string>
+    <string name="first_name">Adiwijaya</string>
+    <string name="last_name">Satria Nusantara</string>
+    <string name="role">Farmer</string>
+</resources>
