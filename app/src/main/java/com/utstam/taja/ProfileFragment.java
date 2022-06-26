@@ -1,5 +1,6 @@
 package com.utstam.taja;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,7 +13,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.utstam.taja.databinding.ActivityMainBinding;
+import com.utstam.taja.databinding.FragmentHomeBinding;
 import com.utstam.taja.databinding.FragmentProfileBinding;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -69,6 +78,9 @@ public class ProfileFragment extends Fragment {
     Button aboutButton;
     TextView name;
 
+    Retrofit retrofit;
+    UserApiInterface userApiInterface;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,9 +90,34 @@ public class ProfileFragment extends Fragment {
         fragmentChangeListener = (FragmentChangeListener) getActivity();
         aboutButton = fragmentProfileBinding.btnAbout;
 
+        retrofit = ApiClient.getClient();
+        userApiInterface = retrofit.create(UserApiInterface.class);
+        MainActivity mainActivity = (MainActivity) getActivity();
+
         // Fill the name slot
         name = fragmentProfileBinding.name;
-        name.setText(String.format("%s %s", getString(R.string.first_name), getString(R.string.last_name)));
+
+        Call<List<User>> callGet = userApiInterface.getUser(mainActivity.username);
+        callGet.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(getActivity(), response.message(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                    startActivity(intent);
+                }
+
+                List<User> users = response.body();
+                name.setText(String.format("%s %s", users.get(0).getFirst_name(), users.get(0).getLast_name()));
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                startActivity(intent);
+            }
+        });
 
         aboutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +125,17 @@ public class ProfileFragment extends Fragment {
                 fragmentChangeListener.changeFragment(activityMainBinding.container.getId(), new AboutFragment());
             }
         });
+
+        fragmentProfileBinding.btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+
+        fragmentProfileBinding.role.setText(mainActivity.role);
 
         return fragmentProfileBinding.getRoot();
     }

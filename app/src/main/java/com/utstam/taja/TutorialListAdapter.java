@@ -1,5 +1,7 @@
 package com.utstam.taja;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +17,8 @@ import java.util.List;
 
 public class TutorialListAdapter extends RecyclerView.Adapter<TutorialListAdapter.TutorialViewHolder> {
     // Accepted dataset = String[title][date]
-    private String[][] localDataSet;
+    private List<Tutorial> localDataSet;
+    Context context;
 
     public static class TutorialViewHolder extends RecyclerView.ViewHolder {
         TextView title, date;
@@ -44,8 +47,9 @@ public class TutorialListAdapter extends RecyclerView.Adapter<TutorialListAdapte
     }
 
     // Create constructor to set local dataset
-    public TutorialListAdapter(String[][] localDataSet){
+    public TutorialListAdapter(List<Tutorial> localDataSet, Context context){
         this.localDataSet = localDataSet;
+        this.context = context;
     }
 
     @NonNull
@@ -57,12 +61,20 @@ public class TutorialListAdapter extends RecyclerView.Adapter<TutorialListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull TutorialViewHolder holder, int position) {
-        holder.getTitle().setText(localDataSet[position][0]);
-        holder.getDate().setText(localDataSet[position][1]);
+        holder.getTitle().setText(localDataSet.get(position).getTitle());
+        holder.getDate().setText(localDataSet.get(position).getDate());
+        holder.getBtn_read().setOnClickListener(new TutorialOnItemClickListener(position, new TutorialOnItemClickListener.OnItemClickCallback() {
+            @Override
+            public void onItemClicked(View view, int position) {
+                Intent intent = new Intent(context, TutorialDetailActivity.class);
+                intent.putExtra("id", localDataSet.get(position).getId());
+                context.startActivity(intent);
+            }
+        }));
     }
 
     @Override
     public int getItemCount() {
-        return localDataSet.length;
+        return localDataSet.size();
     }
 }

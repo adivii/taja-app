@@ -9,9 +9,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.utstam.taja.databinding.FragmentTutorialBinding;
 import com.utstam.taja.databinding.TutorialListBinding;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +69,8 @@ public class TutorialFragment extends Fragment {
     }
 
     FragmentTutorialBinding fragmentTutorialBinding;
+    TutorialApiInterface tutorialApiInterface;
+    Retrofit retrofit;
     RecyclerView recyclerView;
 
     @Override
@@ -68,18 +78,32 @@ public class TutorialFragment extends Fragment {
                              Bundle savedInstanceState) {
         fragmentTutorialBinding = FragmentTutorialBinding.inflate(inflater, container, false);
 
+        retrofit = ApiClient.getClient();
+        tutorialApiInterface = retrofit.create(TutorialApiInterface.class);
+
         recyclerView = fragmentTutorialBinding.tutorialListContainer;
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(fragmentTutorialBinding.getRoot().getContext()));
 
-        String[][] tutorialList = {
-                {"Bokhasi", "12 April 2021"},
-                {"Budidaya Mina Padi", "10 April 2021"},
-                {"Makna \"Padi : Hati dan Jiwa Masyarakat Indonesia\"", "9 Maret 2021"}
-        };
+        Call<List<Tutorial>> callFetch = tutorialApiInterface.getTutorial();
+        callFetch.enqueue(new Callback<List<Tutorial>>() {
+            @Override
+            public void onResponse(Call<List<Tutorial>> call, Response<List<Tutorial>> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(getActivity(), response.message(), Toast.LENGTH_SHORT).show();
+                }else{
+                    List<Tutorial> tutorialList = response.body();
 
-        TutorialListAdapter tutorialListAdapter = new TutorialListAdapter(tutorialList);
-        recyclerView.setAdapter(tutorialListAdapter);
+                    TutorialListAdapter tutorialListAdapter = new TutorialListAdapter(tutorialList, getActivity());
+                    recyclerView.setAdapter(tutorialListAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Tutorial>> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return fragmentTutorialBinding.getRoot();
     }

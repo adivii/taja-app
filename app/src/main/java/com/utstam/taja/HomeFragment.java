@@ -1,5 +1,6 @@
 package com.utstam.taja;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,8 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.utstam.taja.databinding.FragmentHomeBinding;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,14 +68,44 @@ public class HomeFragment extends Fragment {
     }
 
     FragmentHomeBinding fragmentHomeBinding;
+    Retrofit retrofit;
+    UserApiInterface userApiInterface;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false);
-
         TextView firstName = fragmentHomeBinding.firstName;
+
+        retrofit = ApiClient.getClient();
+        userApiInterface = retrofit.create(UserApiInterface.class);
+        MainActivity mainActivity = (MainActivity) getActivity();
+
+        Call<List<User>> callGet = userApiInterface.getUser(mainActivity.username);
+        callGet.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(getActivity(), response.message(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                    startActivity(intent);
+                }
+
+                List<User> users = response.body();
+                firstName.setText(users.get(0).getFirst_name());
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        firstName.setText(mainActivity.username);
         firstName.setAllCaps(true);
+        fragmentHomeBinding.role.setText(mainActivity.role);
 
 
         return fragmentHomeBinding.getRoot();

@@ -1,6 +1,9 @@
 package com.utstam.taja;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -14,6 +17,8 @@ import com.utstam.taja.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, FragmentChangeListener{
     ActivityMainBinding activityMainBinding;
     BottomNavigationView bottomNavigationView;
+    public String username;
+    public String role;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +36,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView = activityMainBinding.mainNavigationView;
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.homePage);
+
+        username = getIntent().getStringExtra("username");
+        role = getIntent().getStringExtra("role");
+        Log.d(TAG, username);
     }
 
     // Implement changeFragment() method to enable the fragment changing feature from the current fragment
@@ -39,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         getSupportFragmentManager().
                 beginTransaction().
                 replace(container, fragment).
-                addToBackStack(Integer.toString(fragment.getId())).
                 commit();
     }
 
@@ -65,5 +73,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
     }
 
-
+    public String getUsername() {
+        return username;
+    }
 }

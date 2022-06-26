@@ -55,6 +55,19 @@
         android:text="Learn About Us"
         android:textColor="?attr/colorPrimary"
         android:textSize="6sp"
+        app:layout_constraintBottom_toTopOf="@id/btn_logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/red"
+        android:text="Logout"
+        android:textColor="@color/white"
+        android:textSize="6sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
