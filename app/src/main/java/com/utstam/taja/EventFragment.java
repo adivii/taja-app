@@ -9,8 +9,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.utstam.taja.databinding.FragmentEventBinding;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,6 +68,8 @@ public class EventFragment extends Fragment {
     }
 
     FragmentEventBinding fragmentEventBinding;
+    EventApiInterface eventApiInterface;
+    Retrofit retrofit;
     RecyclerView recyclerView;
 
     @Override
@@ -67,17 +77,32 @@ public class EventFragment extends Fragment {
                              Bundle savedInstanceState) {
         fragmentEventBinding = FragmentEventBinding.inflate(inflater, container, false);
 
+        retrofit = ApiClient.getClient();
+        eventApiInterface = retrofit.create(EventApiInterface.class);
+
         recyclerView = fragmentEventBinding.eventListContainer;
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(fragmentEventBinding.getRoot().getContext()));
 
-        String[][] eventList = {
-                {"Seminar Tani 4.0", "Aula Serumpun Padi", "05 Mei 2022"},
-                {"Bedah Buku \"Padi : Hati dan Jiwa Masyarakat Indonesia\"", "Zoom Meeting", "12 Mei 2022"}
-        };
+        Call<List<Event>> callFetch = eventApiInterface.getEvent();
+        callFetch.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(getActivity(), response.message(), Toast.LENGTH_SHORT).show();
+                }else{
+                    List<Event> eventList = response.body();
 
-        EventListAdapter eventListAdapter = new EventListAdapter(eventList);
-        recyclerView.setAdapter(eventListAdapter);
+                    EventListAdapter eventListAdapter = new EventListAdapter(eventList, getActivity());
+                    recyclerView.setAdapter(eventListAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Event>> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return fragmentEventBinding.getRoot();
     }

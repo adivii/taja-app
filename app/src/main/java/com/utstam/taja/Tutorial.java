@@ -4,6 +4,13 @@ public class Tutorial {
     int id;
     String title, date, content;
 
+    public Tutorial(int id, String title, String date, String content) {
+        this.id = id;
+        this.title = title;
+        this.date = date;
+        this.content = content;
+    }
+
     public int getId() {
         return id;
     }

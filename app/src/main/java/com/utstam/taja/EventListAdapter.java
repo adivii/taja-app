@@ -1,5 +1,6 @@
 package com.utstam.taja;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -9,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.utstam.taja.databinding.EventListBinding;
 
+import java.util.List;
+
 public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.EventViewHolder> {
-    String[][] localDataSet;
+    List<Event> localDataSet;
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView eventTitle, eventPlace, eventDate;
@@ -36,7 +39,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         }
     }
 
-    public EventListAdapter(String[][] localDataSet) {
+    public EventListAdapter(List<Event> localDataSet, Context context) {
         this.localDataSet = localDataSet;
     }
 
@@ -49,13 +52,13 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
-        holder.getEventTitle().setText(localDataSet[position][0]);
-        holder.getEventPlace().setText(localDataSet[position][1]);
-        holder.getEventDate().setText(localDataSet[position][2]);
+        holder.getEventTitle().setText(localDataSet.get(position).getEvent_title());
+        holder.getEventPlace().setText(localDataSet.get(position).getEvent_place());
+        holder.getEventDate().setText(localDataSet.get(position).getEvent_date());
     }
 
     @Override
     public int getItemCount() {
-        return localDataSet.length;
+        return localDataSet.size();
     }
 }
